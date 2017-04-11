@@ -1,8 +1,8 @@
 'use strict';
 
 /* AdUser model */
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+var Mongoose = require('mongoose');
+var Schema = Mongoose.Schema;
 
 var UserSchema = new Schema({
     name: String,

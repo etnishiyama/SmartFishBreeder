@@ -5,9 +5,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
-
-var index = require('./routes/index');
-var users = require('./routes/users');
+var raspberry = require('./app/utils/Raspberry');
+var ApplicationUtils = require('./app/utils/ApplicationUtils');
 
 var app = express();
 
@@ -39,6 +38,9 @@ app.use(morgan('dev'));
 // Routes config
 // RESTful API
 require('./config/routes')(app);
+
+console.log("Teste1...");
+ApplicationUtils.populateRgbLights;
 
 app.get('/', function(req, res) {
     res.sendFile('/index.html');

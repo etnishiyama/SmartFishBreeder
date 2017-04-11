@@ -1,18 +1,17 @@
 'use strict';
 
-var express = require('express'),
-    router = express.Router(),
-    userController = require('../controller/UserController'),
-    routeSecurity = require('../utils/SecurityLayer');
+var Express = require('express'),
+    Router = Express.Router(),
+    UserController = require('../controller/UserController'),
+    RouteSecurity = require('../utils/SecurityLayer');
 
-router.post('/authenticate', userController.authenticate);
-router.post('/', userController.insertUser);
-router.get('/test', userController.test);
+Router.post('/authenticate', UserController.authenticate);
+Router.post('/', UserController.insertUser);
 
-routeSecurity.addJwtSecurityToRouter(router);
+RouteSecurity.addJwtSecurityToRouter(router);
 
 // Route without authentication
-router.get('/', userController.getUsers);
+Router.get('/', UserController.getUsers);
 
 // Export routes
-module.exports = router;
+module.exports = Router;

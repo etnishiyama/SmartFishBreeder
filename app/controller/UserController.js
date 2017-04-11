@@ -2,10 +2,6 @@ var user = require('../model/UserModel'),
     jwt = require('jsonwebtoken'),
     secret = require('../../config/secret');
 
-exports.test = function(req, res) {
-    res.send("Test works!");
-};
-
 exports.insertUser = function(req, res) {
     var newUser = new user(req.body);
 
