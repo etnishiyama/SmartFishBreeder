@@ -1,10 +1,12 @@
 'use strict';
 
-var Mongoose = require('mongoose'),
-    Schema = Mongoose.Schema;
+var mongoose = require('mongoose'),
+    schema = mongoose.Schema;
+
+mongoose.set('debug', true);
 
 // Overall model schema
-var OverallSchema = new Schema({
+var overallSchema = new schema({
     rgbLights: {
         type: Schema.Types.ObjectId,
         ref: 'RgbLight'
@@ -17,4 +19,4 @@ var OverallSchema = new Schema({
     timestamps: true
 });
 
-module.exports = Mongoose.model('Overall', OverallSchema);
+module.exports = mongoose.model('Overall', overallSchema);

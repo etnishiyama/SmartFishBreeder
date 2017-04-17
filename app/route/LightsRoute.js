@@ -1,16 +1,16 @@
 'use strict';
 
-var Express = require('express'),
-    Router = Express.Router(),
-    LightController = require('../controller/LightController'),
+var express = require('express'),
+    router = express.Router(),
+    lightController = require('../controller/LightController'),
     routeSecurity = require('../utils/SecurityLayer');
 
 // Require jwt token
-routeSecurity.addJwtSecurityToRouter(Router);
+//routeSecurity.addJwtSecurityToRouter(Router);
 
 // Routes
-Router.get('/', LightController.getAllRgbLights);
-Router.post('/rgb', LightController.createRgbLightEntry);
-Router.post('/rgb/:color_id', LightController.setRgbLightByColorId);
+router.get('/rgb/', lightController.getAllRgbLights);
+router.post('/rgb/', lightController.createRgbLightEntry);
+router.post('/rgb/:color', lightController.setRgbLightByColorNameOrId);
 
-module.exports = Router;
+module.exports = router;

@@ -2,28 +2,27 @@
 
 var RgbLightModel = require('../model/RgbLightModel'),
     NodeCron = require('node-cron'),
-    PiBlaster = require('pi-blaster.js'),
-    raspberry = require('../utils/Raspberry');
+    raspberry = require('../raspberry/PinOut'),
+    raspberryLights = require('../raspberry/Light'),
+    appUtils = require('../utils/ApplicationUtils');
 
 NodeCron.schedule("0 * * * * *", function () {
     console.log("Change lights...");
 });
 
 exports.getAllRgbLights = function (req, res) {
-    RgbLightModel.find(function (err, docs) {
-        if (err) {
-            console.log(err.stack);
-            res.status(500).end("Error: " + err.message);
-        } else {
-            res.json({
-                success: true,
-                result: docs
-            })
-        }
+    RgbLightModel.find().exec(function (docs) {
+        res.json({
+            success: true,
+            result: docs
+        })
+    }, function (err) {
+        console.log(err.stack);
+        res.status(500).end("Error: " + err.message);
     });
 };
 
-exports.createRgbLightEntry = function (req, res) {
+exports.createRgbLightEntry = function (req, res, next) {
     var newRgbValues = new RgbLightModel({
         red: req.body.red,
         green: req.body.green,
@@ -31,49 +30,45 @@ exports.createRgbLightEntry = function (req, res) {
         name: req.body.name
     });
 
-    RgbLightModel.findOne({name: newRgbValues.name}, function(err, doc) {
-        if(err) {
-            console.log(err.stack);
-            res.status(500).end("Error: " + err.message);
-        } else if(!doc) {
-            RgbLightModel.count(function(err, doc) {
-                if(err) {
-                    console.log(err.stack);
-                    res.status(500).end("Error: " + err.message);
-                } else {
-                    newRgbValues.color_id = doc
-                    newRgbValues.save(function(err, doc) {
-                        if(err) {
-                            console.log(err.stack);
-                            res.status(500).end("Error: " + err.message);
-                        } else {
-                            res.json({
-                                success: true,
-                                result: doc
-                            })
-                        }
-                    });
-                }
-            });
-        } else {
-            res.json({
-                success: false,
-                result: "Name already exist"
-            })
-        }
-    });
+    RgbLightModel.findOne({name: newRgbValues.name}).exec()
+        .then(function (doc) {
+            if (!doc) {
+                return RgbLightModel.count().exec();
+            } else {
+                return res.json({
+                    success: false,
+                    result: "Name already exists!"
+                })
+            }
+        })
+        .then(function (count) {
+            newRgbValues.color_id = count;
+            return newRgbValues.save();
+        })
+        .then(function (doc) {
+            if (doc) {
+                return res.json({
+                    success: true,
+                    result: doc
+                })
+            }
+        })
+        .then(function (undefined, err) {
+            console.log(err);
+        })
 };
 
-exports.setRgbLightByColorId = function(req, res) {
-    RgbLightModel.findOne({color_id: req.params.color_id}, function(err, doc) {
-        if(err) {
+exports.setRgbLightByColorNameOrId = function (req, res) {
+    var color = req.params.color;
+    RgbLightModel.findOne(appUtils.isInt(color) ? {color_id: color} : {name: color}).exec(function (err, doc) {
+        if (err) {
             console.log(err.stack);
             res.status(500).end("Error: " + err.message);
-        } else if(doc) {
-            changeRgbLights(doc.red, doc.green, doc.blue);
+        } else if (doc) {
+            raspberryLights.changeRgbLights1(doc.red, doc.green, doc.blue);
             res.json({
                 success: true,
-                result: "RGB lights changed by id"
+                result: doc
             })
         } else {
             res.json({
@@ -82,10 +77,4 @@ exports.setRgbLightByColorId = function(req, res) {
             })
         }
     })
-};
-
-var changeRgbLights = function(red, green, blue) {
-    PiBlaster.setPwm(raspberry.pins.redGpioPin, red / 255);
-    PiBlaster.setPwm(raspberry.pins.greenGpioPin, green / 255);
-    PiBlaster.setPwm(raspberry.pins.blueGpioPin, blue / 255);
 };

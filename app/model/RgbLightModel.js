@@ -1,10 +1,12 @@
 'use strict';
 
-var Mongoose = require('mongoose');
-var Schema = Mongoose.Schema;
+var mongoose = require('mongoose');
+var schema = mongoose.Schema;
 
-// MongoDb Schema
-var rgbLightSchema = new Schema({
+mongoose.set('debug', true);
+
+// MongoDb schema
+var rgbLightSchema = new schema({
     color_id: {
         type: Number,
         unique: true
@@ -17,4 +19,4 @@ var rgbLightSchema = new Schema({
     timestamps: true
 });
 
-module.exports = Mongoose.model('RgbLight', rgbLightSchema);
+module.exports = mongoose.model('RgbLight', rgbLightSchema);

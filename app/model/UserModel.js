@@ -1,10 +1,12 @@
 'use strict';
 
 /* AdUser model */
-var Mongoose = require('mongoose');
-var Schema = Mongoose.Schema;
+var mongoose = require('mongoose');
+var schema = mongoose.Schema;
 
-var UserSchema = new Schema({
+mongoose.set('debug', true);
+
+var userSchema = new schema({
     name: String,
     username: String,
     password: String,
@@ -14,4 +16,4 @@ var UserSchema = new Schema({
 });
 
 // Export model
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', userSchema);
