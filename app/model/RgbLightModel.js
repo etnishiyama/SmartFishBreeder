@@ -3,8 +3,6 @@
 var mongoose = require('mongoose');
 var schema = mongoose.Schema;
 
-mongoose.set('debug', true);
-
 // MongoDb schema
 var rgbLightSchema = new schema({
     color_id: {

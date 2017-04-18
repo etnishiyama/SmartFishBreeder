@@ -32,28 +32,30 @@ exports.getUsers = function (req, res) {
 // Authenticate user on LDAP server
 exports.authenticate = function (req, res) {
     // return token if user is on database
-    user.findOne({username: req.body.username}).exec(function (err, doc) {
-        if (err) {
-            console.log(err.stack);
-        } else if (doc) {
-            console.log("not null");
-            var userObject = {
-                username: req.body.username
-            };
+    user.findOne({username: req.body.username})
+        .exec()
+        .then(function (doc) {
+            if (doc) {
+                var userObject = {
+                    username: req.body.username
+                };
 
-            var token = jwt.sign(userObject, secret.key, {
-                expiresIn: '999d'
-            });
+                var token = jwt.sign(userObject, secret.key, {
+                    expiresIn: '999d'
+                });
 
-            res.json({
-                success: true,
-                token: token
-            });
-        } else {
-            res.json({
-                success: false,
-                message: "user not found!"
-            });
-        }
-    });
+                res.json({
+                    success: true,
+                    token: token
+                });
+            } else {
+                res.json({
+                    success: false,
+                    message: "user not found!"
+                });
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
 };

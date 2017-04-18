@@ -5,7 +5,7 @@ var express = require('express'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
     raspberry = require('./app/raspberry/PinOut'),
-    ApplicationUtils = require('./app/utils/ApplicationUtils'),
+    applicationUtils = require('./app/utils/ApplicationUtils'),
     app = express();
 
 // uncomment after placing your favicon in /public
@@ -25,9 +25,13 @@ var connectDb = function () {
             }
         }
     };
+    mongoose.Promise = global.Promise;
+    mongoose.set('debug', true);
     mongoose.connect('mongodb://localhost/fishbreeder', options);
 };
 connectDb();
+
+applicationUtils.loadLightChange();
 
 var db = mongoose.connection;
 db.on('error', console.log);
@@ -39,7 +43,7 @@ require('./config/routes')(app);
 // Setup the application
 console.log("Setting up the application...");
 // Populate db with default light values
-ApplicationUtils.populateRgbLightsDb();
+applicationUtils.populateRgbLightsDb();
 console.log("Setup complete!");
 
 // Home index

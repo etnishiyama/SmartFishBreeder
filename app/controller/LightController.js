@@ -1,25 +1,23 @@
 'use strict';
 
 var RgbLightModel = require('../model/RgbLightModel'),
-    NodeCron = require('node-cron'),
     raspberry = require('../raspberry/PinOut'),
     raspberryLights = require('../raspberry/Light'),
+    lightChangeModel = require('../model/LightChangeModel'),
     appUtils = require('../utils/ApplicationUtils');
 
-NodeCron.schedule("0 * * * * *", function () {
-    console.log("Change lights...");
-});
-
 exports.getAllRgbLights = function (req, res) {
-    RgbLightModel.find().exec(function (docs) {
-        res.json({
-            success: true,
-            result: docs
+    RgbLightModel.find().exec()
+        .then(function (docs) {
+            res.json({
+                success: true,
+                result: docs
+            })
         })
-    }, function (err) {
-        console.log(err.stack);
-        res.status(500).end("Error: " + err.message);
-    });
+        .catch(function (err) {
+            console.log(err.stack);
+            res.status(500).end("Error: " + err.message);
+        });
 };
 
 exports.createRgbLightEntry = function (req, res, next) {
@@ -53,22 +51,36 @@ exports.createRgbLightEntry = function (req, res, next) {
                 })
             }
         })
-        .then(function (undefined, err) {
+        .catch(function (err) {
             console.log(err);
         })
 };
 
-exports.setRgbLightByColorNameOrId = function (req, res) {
-    var color = req.params.color;
-    RgbLightModel.findOne(appUtils.isInt(color) ? {color_id: color} : {name: color}).exec(function (err, doc) {
-        if (err) {
-            console.log(err.stack);
-            res.status(500).end("Error: " + err.message);
-        } else if (doc) {
-            raspberryLights.changeRgbLights1(doc.red, doc.green, doc.blue);
+exports.createLightChangeEntry = function(req, res) {
+    var newLightChangeModel = new lightChangeModel();
+    newLightChangeModel.time = new Date(req.body.timestamp*1000);
+    getRgbLight(req.body.color, function(rgbLight) {
+        newLightChangeModel._rgbLight = rgbLight;
+
+        newLightChangeModel.save()
+            .then(function(doc) {
+                res.json({
+                    success: true,
+                    result: doc
+                })
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
+    });
+};
+
+exports.getRgbLightByColorNameOrId = function (req, res) {
+    getRgbLight(req.params.color, function(rgbLight) {
+        if(rgbLight) {
             res.json({
                 success: true,
-                result: doc
+                result: rgbLight
             })
         } else {
             res.json({
@@ -76,5 +88,44 @@ exports.setRgbLightByColorNameOrId = function (req, res) {
                 result: "Color id not found"
             })
         }
-    })
+    });
+};
+
+function getRgbLight (color, callback) {
+    RgbLightModel.findOne(appUtils.isInt(color) ? {color_id: color} : {name: color}).exec()
+        .then(function (doc) {
+            if (doc) {
+                callback(doc);
+            } else {
+                callback(null);
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
+}
+
+exports.setRgbLightByColorNameOrId = function (req, res) {
+    getRgbLight(req.params.color, function(rgbLight) {
+        if (rgbLight) {
+            var isLightChanged = raspberryLights.changeRgbLights(rgbLightIndex, rgbLight);
+
+            if(isLightChanged) {
+                res.json({
+                    success: true,
+                    result: "RGB lights changed to: " + doc.name
+                })
+            } else {
+                res.json({
+                    success: false,
+                    result: "RGB lights not changed due to wrong index!"
+                })
+            }
+        } else {
+            res.json({
+                success: false,
+                result: "Color id not found"
+            })
+        }
+    });
 };
