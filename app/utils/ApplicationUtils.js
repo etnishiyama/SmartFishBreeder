@@ -1,11 +1,7 @@
 'use strict';
 
 var RgbLightModel = require('../model/RgbLightModel'),
-    LightChangeModel = require('../model/LightChangeModel'),
-    nodeCron = require('node-cron'),
-    raspberryLights = require('../raspberry/Light'),
-    cronSchedules = [],
-    cronScheduleIndex = 0;
+    LightChangeModel = require('../model/LightChangeModel');
 
 var MAX_RGB_LIGHTS_COUNT = 5;
 
@@ -31,39 +27,6 @@ exports.populateRgbLightsDb = function () {
             });
     }
 };
-
-exports.loadLightChange = function () {
-    clearCronJobs();
-    LightChangeModel.find({})
-        .populate('_rgbLight')
-        .exec()
-        .then(function (docs) {
-            for (var i in docs) {
-                setCronJob(docs[i]);
-            }
-        })
-};
-
-function clearCronJobs() {
-    for(var i=0; i<cronScheduleIndex; i++) {
-        cronSchedules[i].stop();
-    }
-    cronSchedules = [];
-    cronScheduleIndex = 0;
-}
-
-function setCronJob(lightChange) {
-    var timeToChange = lightChange.time;
-    var nodeCronTime = timeToChange.getSeconds() + " " + timeToChange.getMinutes() + " " + timeToChange.getHours() + " * * *";
-
-    console.log("cron time: " + nodeCronTime);
-
-    cronSchedules[cronScheduleIndex] = nodeCron.schedule(nodeCronTime, function () {
-        console.log("Lights changed at: " + new Date());
-    });
-    cronSchedules[cronScheduleIndex].start();
-    cronScheduleIndex++;
-}
 
 exports.isInt = function (value) {
     if (isNaN(value)) {

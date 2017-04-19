@@ -15,6 +15,7 @@
     "morgan": "*",
     "jsonwebtoken": "*",
     "node-cron": "*",
-    "pi-blaster.js": "*"
+    "pi-blaster.js": "*",
+    "stepper-wiringpi": "*"
   }
 }

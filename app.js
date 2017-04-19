@@ -6,6 +6,8 @@ var express = require('express'),
     mongoose = require('mongoose'),
     raspberry = require('./app/raspberry/PinOut'),
     applicationUtils = require('./app/utils/ApplicationUtils'),
+    raspberryLights = require('./app/raspberry/Light'),
+    raspberryStepper = require('./app/raspberry/StepperMotor'),
     app = express();
 
 // uncomment after placing your favicon in /public
@@ -31,7 +33,8 @@ var connectDb = function () {
 };
 connectDb();
 
-applicationUtils.loadLightChange();
+raspberryLights.loadLightChange();
+raspberryStepper.updateFeeding();
 
 var db = mongoose.connection;
 db.on('error', console.log);
