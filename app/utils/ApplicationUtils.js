@@ -54,7 +54,7 @@ function clearCronJobs() {
 
 function setCronJob(lightChange) {
     var timeToChange = lightChange.time;
-    var nodeCronTime = timeToChange.getSeconds() +/* " " + timeToChange.getMinutes() + " " + timeToChange.getHours() +*/ " * * * * *";
+    var nodeCronTime = timeToChange.getSeconds() + " " + timeToChange.getMinutes() + " " + timeToChange.getHours() + " * * *";
 
     console.log("cron time: " + nodeCronTime);
 
