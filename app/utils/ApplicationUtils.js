@@ -33,6 +33,7 @@ exports.populateRgbLightsDb = function () {
 };
 
 exports.loadLightChange = function () {
+    clearCronJobs();
     LightChangeModel.find({})
         .populate('_rgbLight')
         .exec()
@@ -43,13 +44,25 @@ exports.loadLightChange = function () {
         })
 };
 
+function clearCronJobs() {
+    for(var i=0; i<cronScheduleIndex; i++) {
+        cronSchedules[i].stop();
+    }
+    cronSchedules = [];
+    cronScheduleIndex = 0;
+}
+
 function setCronJob(lightChange) {
     var timeToChange = lightChange.time;
-    var nodeCronTime = timeToChange.getSeconds() + " " + timeToChange.getMinutes() + " " + timeToChange.getHours() + " * * *";
+    var nodeCronTime = timeToChange.getSeconds() +/* " " + timeToChange.getMinutes() + " " + timeToChange.getHours() +*/ " * * * * *";
 
-    nodeCron.schedule(nodeCronTime, function () {
-        console.log("Change lights...");
+    console.log("cron time: " + nodeCronTime);
+
+    cronSchedules[cronScheduleIndex] = nodeCron.schedule(nodeCronTime, function () {
+        console.log("Lights changed at: " + new Date());
     });
+    cronSchedules[cronScheduleIndex].start();
+    cronScheduleIndex++;
 }
 
 exports.isInt = function (value) {

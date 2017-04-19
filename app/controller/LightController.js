@@ -64,6 +64,7 @@ exports.createLightChangeEntry = function(req, res) {
 
         newLightChangeModel.save()
             .then(function(doc) {
+                appUtils.loadLightChange();
                 res.json({
                     success: true,
                     result: doc
