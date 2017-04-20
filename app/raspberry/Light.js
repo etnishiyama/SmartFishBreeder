@@ -16,14 +16,14 @@ function changeRgbLightsLocal (index, rgbLight) {
     console.log("changeRgbLights index: "+index+" red: "+rgbLight.red+" green: "+rgbLight.green+" blue: "+rgbLight.blue);
     switch(index) {
         case 1:
-            PiBlaster.setPwm(raspberry.light1Pins.redGpioPin, rgbLight.red);
-            PiBlaster.setPwm(raspberry.light1Pins.greenGpioPin, rgbLight.green);
-            PiBlaster.setPwm(raspberry.light1Pins.blueGpioPin, rgbLight.blue);
+            PiBlaster.setPwm(raspberry.light1Pins.redGpioPin, rgbLight.red / 255);
+            PiBlaster.setPwm(raspberry.light1Pins.greenGpioPin, rgbLight.green / 255);
+            PiBlaster.setPwm(raspberry.light1Pins.blueGpioPin, rgbLight.blue / 255);
             break;
         case 2:
-            PiBlaster.setPwm(raspberry.light2Pins.redGpioPin, rgbLight.red);
-            PiBlaster.setPwm(raspberry.light2Pins.greenGpioPin, rgbLight.green);
-            PiBlaster.setPwm(raspberry.light2Pins.blueGpioPin, rgbLight.blue);
+            PiBlaster.setPwm(raspberry.light2Pins.redGpioPin, rgbLight.red / 255);
+            PiBlaster.setPwm(raspberry.light2Pins.greenGpioPin, rgbLight.green / 255);
+            PiBlaster.setPwm(raspberry.light2Pins.blueGpioPin, rgbLight.blue / 255);
             break;
         default:
             lightChanged = false;
@@ -55,7 +55,6 @@ function clearCronJobs() {
 
 function setCronJob(lightChange) {
     var timeToChange = lightChange.time;
-    console.log("time light change: "+timeToChange);
     var nodeCronTime = timeToChange.getSeconds() + " " + timeToChange.getMinutes() + " " + timeToChange.getHours() + " * * *";
     console.log("Light change cron scheduled: " + nodeCronTime + " color: " + lightChange._rgbLight.name);
 
@@ -63,6 +62,7 @@ function setCronJob(lightChange) {
         console.log("Lights changed at: " + new Date());
         changeRgbLightsLocal(lightChange.index, lightChange._rgbLight);
     });
+
     cronSchedules[cronScheduleIndex].start();
     cronScheduleIndex++;
 }

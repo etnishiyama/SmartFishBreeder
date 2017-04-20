@@ -56,27 +56,27 @@ exports.createRgbLightEntry = function (req, res, next) {
         })
 };
 
-exports.createLightChangeEntry = function(req, res) {
+exports.createLightChangeEntry = function (req, res) {
     var newLightChangeModel = new lightChangeModel();
-    if(req.body.timestamp < 1) {
+    if (req.body.timestamp < 1) {
         res.json({
             success: false,
             result: "Timestamp not set"
         });
     }
-    newLightChangeModel.time = new Date(req.body.timestamp*1000);
-    getRgbLight(req.body.color, function(rgbLight) {
+    newLightChangeModel.time = new Date(req.body.timestamp * 1000);
+    getRgbLight(req.body.color, function (rgbLight) {
         newLightChangeModel._rgbLight = rgbLight;
 
         newLightChangeModel.save()
-            .then(function(doc) {
+            .then(function (doc) {
                 raspberryLights.loadLightChange();
                 res.json({
                     success: true,
                     result: doc
                 })
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 console.log(err);
                 throw err;
             })
@@ -84,8 +84,8 @@ exports.createLightChangeEntry = function(req, res) {
 };
 
 exports.getRgbLightByColorNameOrId = function (req, res) {
-    getRgbLight(req.params.color, function(rgbLight) {
-        if(rgbLight) {
+    getRgbLight(req.params.color, function (rgbLight) {
+        if (rgbLight) {
             res.json({
                 success: true,
                 result: rgbLight
@@ -99,7 +99,7 @@ exports.getRgbLightByColorNameOrId = function (req, res) {
     });
 };
 
-function getRgbLight (color, callback) {
+function getRgbLight(color, callback) {
     RgbLightModel.findOne(appUtils.isInt(color) ? {color_id: color} : {name: color}).exec()
         .then(function (doc) {
             if (doc) {
@@ -114,11 +114,11 @@ function getRgbLight (color, callback) {
 }
 
 exports.setRgbLightByColorNameOrId = function (req, res) {
-    getRgbLight(req.params.color, function(rgbLight) {
+    getRgbLight(req.params.color, function (rgbLight) {
         if (rgbLight) {
             var isLightChanged = raspberryLights.changeRgbLights(rgbLightIndex, rgbLight);
 
-            if(isLightChanged) {
+            if (isLightChanged) {
                 res.json({
                     success: true,
                     result: "RGB lights changed to: " + doc.name

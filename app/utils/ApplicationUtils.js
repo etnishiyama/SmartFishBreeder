@@ -9,7 +9,7 @@ exports.populateRgbLightsDb = function () {
     for (var i = 0; i <= MAX_RGB_LIGHTS_COUNT; i++) {
         var rgbLightEntry = new RgbLightModel();
 
-        var rgbValue = 255 * (i * (10 / MAX_RGB_LIGHTS_COUNT) * 10) / 100;
+        var rgbValue = i / MAX_RGB_LIGHTS_COUNT * (255 * (i * (10 / MAX_RGB_LIGHTS_COUNT) * 10) / 100);
         rgbLightEntry.red = rgbValue;
         rgbLightEntry.green = rgbValue;
         rgbLightEntry.blue = rgbValue;
