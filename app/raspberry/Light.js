@@ -16,14 +16,14 @@ function changeRgbLightsLocal (index, rgbLight) {
     console.log("changeRgbLights index: "+index+" red: "+rgbLight.red+" green: "+rgbLight.green+" blue: "+rgbLight.blue);
     switch(index) {
         case 1:
-            PiBlaster.setPwm(raspberry.light1Pins.redGpioPin, rgbLight.red / 255);
-            PiBlaster.setPwm(raspberry.light1Pins.greenGpioPin, rgbLight.green / 255);
-            PiBlaster.setPwm(raspberry.light1Pins.blueGpioPin, rgbLight.blue / 255);
+            PiBlaster.setPwm(raspberry.light1Pins.redGpioPin, rgbLight.red);
+            PiBlaster.setPwm(raspberry.light1Pins.greenGpioPin, rgbLight.green);
+            PiBlaster.setPwm(raspberry.light1Pins.blueGpioPin, rgbLight.blue);
             break;
         case 2:
-            PiBlaster.setPwm(raspberry.light2Pins.redGpioPin, rgbLight.red / 255);
-            PiBlaster.setPwm(raspberry.light2Pins.greenGpioPin, rgbLight.green / 255);
-            PiBlaster.setPwm(raspberry.light2Pins.blueGpioPin, rgbLight.blue / 255);
+            PiBlaster.setPwm(raspberry.light2Pins.redGpioPin, rgbLight.red);
+            PiBlaster.setPwm(raspberry.light2Pins.greenGpioPin, rgbLight.green);
+            PiBlaster.setPwm(raspberry.light2Pins.blueGpioPin, rgbLight.blue);
             break;
         default:
             lightChanged = false;
@@ -31,7 +31,7 @@ function changeRgbLightsLocal (index, rgbLight) {
     }
 
     return lightChanged;
-};
+}
 
 exports.loadLightChange = function () {
     clearCronJobs();
@@ -55,8 +55,9 @@ function clearCronJobs() {
 
 function setCronJob(lightChange) {
     var timeToChange = lightChange.time;
+    console.log("time light change: "+timeToChange);
     var nodeCronTime = timeToChange.getSeconds() + " " + timeToChange.getMinutes() + " " + timeToChange.getHours() + " * * *";
-    console.log("Light change cron scheduled: " + nodeCronTime + " color: ");
+    console.log("Light change cron scheduled: " + nodeCronTime + " color: " + lightChange._rgbLight.name);
 
     cronSchedules[cronScheduleIndex] = nodeCron.schedule(nodeCronTime, function () {
         console.log("Lights changed at: " + new Date());

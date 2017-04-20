@@ -58,13 +58,19 @@ exports.createRgbLightEntry = function (req, res, next) {
 
 exports.createLightChangeEntry = function(req, res) {
     var newLightChangeModel = new lightChangeModel();
+    if(req.body.timestamp < 1) {
+        res.json({
+            success: false,
+            result: "Timestamp not set"
+        });
+    }
     newLightChangeModel.time = new Date(req.body.timestamp*1000);
     getRgbLight(req.body.color, function(rgbLight) {
         newLightChangeModel._rgbLight = rgbLight;
 
         newLightChangeModel.save()
             .then(function(doc) {
-                appUtils.loadLightChange();
+                raspberryLights.loadLightChange();
                 res.json({
                     success: true,
                     result: doc
@@ -72,6 +78,7 @@ exports.createLightChangeEntry = function(req, res) {
             })
             .catch(function(err) {
                 console.log(err);
+                throw err;
             })
     });
 };
