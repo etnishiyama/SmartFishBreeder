@@ -13,7 +13,7 @@ exports.populateRgbLightsDb = function () {
         rgbLightEntry.red = rgbValue;
         rgbLightEntry.green = rgbValue;
         rgbLightEntry.blue = rgbValue;
-        rgbLightEntry.title = "white" + i;
+        rgbLightEntry.name = "white" + i;
         rgbLightEntry.color_id = i;
 
         rgbLightEntry.save()
